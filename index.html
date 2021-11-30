@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Fetch Test</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="">
+<style text="stylesheet/css">
+    
+    body{
+        background-color: #f4f4f4;
+        font-family: Arial;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    input, textarea {
+        padding: 10px;
+    }
+
+    .form-group input, textarea {
+        width: 95%;
+        background-color: #e6e6e6;
+        border-radius: 5px;
+        border: black solid 2px;
+    }
+
+    #btnSubmit {
+        background-color: black;
+        color: white;
+        padding: 10px 15px;
+        margin-top: 10px;
+    }
+
+    ul{
+        list-style: none;
+        padding-left: 0px;
+        line-height: 25px;
+    }
+
+</style>
+<body>
+    <div class="container">
+        <div class="form-group">
+            <p>Title: </p><input id="title">
+            <br><p>Body: </p><textarea id="body"></textarea>
+            <br><button id="btnSubmit" type="submit">Submit</button>
+        </div>
+        <br><br><h3>All Posts:</h3>
+        <ul id="GetAllPosts">
+            <li>First title: First body</li>
+            <li>Second title: Second body</li>
+            <li>Third title: Third body</li>
+        </ul>
+    </div>
+<script>
+    
+    let btnSubmit = document.querySelector("#btnSubmit");
+
+    btnSubmit.addEventListener('click', () => {
+
+        let titleEl = document.querySelector('#title');
+        let bodyEl = document.querySelector('#body');
+
+        const data = { 
+            title: titleEl.value,
+            body: bodyEl.value
+        };
+
+        console.log(data);
+
+        fetch('http://localhost:49824/api/Posts', {
+            method: 'POST', // or 'PUT'
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // console.log('Success:', data);
+            
+            //--------------------------------
+
+            fetchAllPosts();
+
+            //--------------------------------
+
+            titleEl.value = '';
+            bodyEl.value = '';
+
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+
+        function fetchAllPosts () {
+            fetch('http://localhost:49824/api/Posts', {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'Access-Control-Allow-Origin':'*'
+            }
+            })
+            .then(response => response.json())
+            .then(data => {
+                let allPostEl = document.querySelector("#GetAllPosts");
+
+                // console.log(data);
+
+                let output = '';
+                for (let i=0; i<data.length; i++)
+                {
+                    output += `<li>${data[i].Title}: ${data[i].Body}</li>`;
+                }
+
+                allPostEl.innerHTML = output;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    });
+
+    
+</script>
+
+</body>
+</html>
